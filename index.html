@@ -1,0 +1,456 @@
+// public/app.js - CONFIGURAÇÃO FINAL SUPABASE
+const SUPABASE_URL = 'https://kctzwwczcthjmdgvxuks.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjdHp3d2N6Y3Roam1kZ3Z4dWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5ODIwNDYsImV4cCI6MjA3ODU1ODA0Nn0.HafwqrEnJ5Slm3wRg4_KEvGHiTuNJafztVfWbuSZ_84';
+
+// Inicializa o cliente Supabase (requer a tag <script> no index.html)
+const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+// SISTEMA SIMPLIFICADO - LOGIN DIRETO (Versão adaptada para Supabase)
+class LanzacaIA {
+    constructor() {
+        this.bets = {
+            individual: [],
+            multiple: [],
+            safe: [],
+            top: []
+        };
+        this.usuarioLogado = null;
+        this.isAdmin = false;
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.simulateLoading();
+        // A lógica de login e carregamento será chamada aqui
+    }
+
+    setupEventListeners() {
+        // Filtros
+        document.querySelectorAll('.botao-filtro').forEach(botao => {
+            botao.addEventListener('click', (e) => {
+                document.querySelectorAll('.botao-filtro').forEach(b => b.classList.remove('ativo'));
+                e.target.classList.add('ativo');
+                this.filtrarApostas(e.target.dataset.filtro);
+            });
+        });
+
+        // Botão de Atualizar
+        document.getElementById('botaoAtualizar').addEventListener('click', () => {
+            this.mostrarToast('🔄 Atualizando dados do servidor...', 'info');
+            this.loadDataFromSupabase(); // Chama a função que busca dados reais
+        });
+        
+        // Botão de Logout
+        document.getElementById('botaoLogout').addEventListener('click', () => this.fazerLogout());
+
+        // Enter no login (Função global)
+        document.getElementById('senha').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                fazerLogin();
+            }
+        });
+        
+        // Inicia a verificação de login (simples, sem firebase auth real)
+        this.verificarAuthState();
+    }
+    
+    // Simulação de login/auth sem Firebase
+    verificarAuthState() {
+        // Como removemos o Firebase Auth, faremos um controle simples via localStorage
+        const tokenSimulado = localStorage.getItem('lanzaca_auth');
+        if (tokenSimulado === 'admin_logged') {
+            this.usuarioLogado = { email: 'admin@lanzaca.com' };
+            this.isAdmin = true;
+            this.mostrarTelaPrincipal();
+        }
+    }
+
+    async fazerLogin(usuario, senha) {
+        // Simulação de credenciais
+        if (usuario === 'admin' && senha === '281500') {
+            localStorage.setItem('lanzaca_auth', 'admin_logged');
+            this.usuarioLogado = { email: 'admin@lanzaca.com' };
+            this.isAdmin = true;
+            this.mostrarTelaPrincipal();
+            return true;
+        } else {
+            this.mostrarToast('❌ Usuário ou senha incorretos!', 'error');
+            return false;
+        }
+    }
+
+    fazerLogout() {
+        localStorage.removeItem('lanzaca_auth');
+        this.usuarioLogado = null;
+        this.isAdmin = false;
+        document.getElementById('containerPrincipal').style.display = 'none';
+        document.getElementById('telaLogin').style.display = 'flex';
+        document.getElementById('usuario').value = '';
+        document.getElementById('senha').value = '';
+        this.mostrarToast('Logout realizado com sucesso!');
+    }
+
+    mostrarTelaPrincipal() {
+        document.getElementById('telaLogin').style.display = 'none';
+        document.getElementById('telaCarregamento').style.display = 'flex';
+        
+        setTimeout(() => {
+            document.getElementById('telaCarregamento').style.display = 'none';
+            document.getElementById('containerPrincipal').style.display = 'block';
+            
+            // Atualizar nome do usuário
+            document.getElementById('nomeUsuario').textContent = `Olá, Admin!`;
+            
+            // Agora carregamos os dados do Supabase
+            this.loadDataFromSupabase(); 
+
+        }, 1000);
+    }
+
+    simulateLoading() {
+        // Simulação de pré-carregamento visual
+        document.getElementById('topApostas').innerHTML = '<div class="loading-placeholder">Carregando...</div>';
+    }
+    
+    // -----------------------------------------------------------------------------
+    // FUNÇÃO PRINCIPAL: CARREGA DADOS DO SUPABASE
+    // -----------------------------------------------------------------------------
+    async loadDataFromSupabase() {
+        this.mostrarToast('🌎 Carregando palpites da Nuvem...', 'info');
+
+        try {
+            // 1. Pega Apostas Individuais (tabela 'individuais')
+            const { data: individuais, error: errInd } = await supabaseClient
+                .from('individuais')
+                .select('*')
+                .order('value_expected', { ascending: false });
+
+            // 2. Pega Múltiplas (tabela 'multiplas')
+            const { data: multiplas, error: errMul } = await supabaseClient
+                .from('multiplas')
+                .select('*');
+
+            // 3. Pega Surebets (tabela 'surebets')
+            const { data: surebets, error: errSure } = await supabaseClient
+                .from('surebets')
+                .select('*');
+
+            if (errInd || errMul || errSure) {
+                console.error('Erro ao buscar dados do Supabase:', errInd || errMul || errSure);
+                this.mostrarToast('❌ Erro ao carregar dados da Nuvem!', 'error');
+                // Em caso de falha, exibe dados vazios para não travar o app
+                this.bets.individual = [];
+                this.bets.multiple = [];
+                this.bets.safe = [];
+                this.bets.top = [];
+                this.renderAllBets();
+                return;
+            }
+
+            // Mapeia e ajusta os dados
+            this.bets.individual = individuais.map(bet => ({
+                id: bet.id || Date.now() + Math.random(),
+                type: 'individual',
+                match: bet.match,
+                league: bet.league,
+                betType: bet.bet_type,
+                probability: bet.probabilidade || 0.70,
+                odd: bet.odd,
+                house: bet.casa_aposta || 'betano', 
+                value: bet.value_expected,
+                stake: bet.stake || 'MÉDIO',
+                confidence: bet.confidence,
+                // Mapeamento das Odds das casas (usando o campo casa_aposta e link_aposta do Python)
+                odds: {
+                    [bet.casa_aposta]: { 
+                        valor: bet.odd, 
+                        link: bet.link_aposta
+                    }
+                },
+                gender: 'M', 
+                date: 'HOJE',
+                description: 'Análise da IA com VE positivo.'
+            })) || [];
+
+            this.bets.multiple = multiplas.map(m => ({
+                id: m.id || Date.now() + Math.random(),
+                type: 'multipla', // Corrigido para 'multipla'
+                totalOdd: m.odd_total,
+                probability: m.probabilidade,
+                value: m.value_expected || 0.8, // Usando value_expected
+                stake: 'MÉDIO',
+                confidence: m.confianca,
+                // Simulação de odds para o cartão de Múltipla
+                odds: {
+                    betano: { valor: m.odd_total, link: 'https://betano.com/multipla' }
+                },
+                matches: JSON.parse(m.jogos || '[]'), 
+            })) || [];
+
+            this.bets.safe = surebets || []; // surebets são diferentes, mas mantemos o array
+            
+            this.classifyTopAndSafeBets();
+
+            this.renderAllBets();
+            this.updateStatistics();
+            this.mostrarToast('✅ Palpites de hoje carregados!', 'success');
+
+        } catch (error) {
+            console.error('Erro na conexão Supabase:', error);
+            this.mostrarToast('❌ Falha na conexão com o banco de dados.', 'error');
+        }
+    }
+    
+    classifyTopAndSafeBets() {
+        // Safe Bets: Apostas de alto Value e Probabilidade
+        this.bets.safe = [
+            ...this.bets.individual.filter(bet => bet.value > 0.25 && bet.probability > 0.75),
+            ...this.bets.multiple.filter(bet => (bet.value || 0) > 0.3 && (bet.probability || 0) > 0.7)
+        ];
+
+        // Top Bets: As 5 melhores de todas (ordenadas por Value Expected)
+        this.bets.top = [
+            ...this.bets.individual.map(b => ({ ...b, sortValue: b.value })),
+            ...this.bets.multiple.map(b => ({ ...b, sortValue: b.value })),
+        ]
+        .sort((a, b) => b.sortValue - a.sortValue)
+        .slice(0, 5)
+        .map(b => { delete b.sortValue; return b; });
+    }
+    
+    // -----------------------------------------------------------------------------
+    // MÉTODOS DE RENDERIZAÇÃO
+    // -----------------------------------------------------------------------------
+
+    renderAllBets() {
+        // Mapeia os dados internos para a estrutura que o renderizador espera (usando o filtro 'todas' como default para as individuais)
+        this.renderizarSecao('topApostas', this.bets.top);
+        this.renderizarSecao('gridApostasSeguras', this.bets.safe);
+        this.renderizarSecao('gridMultiplas', this.bets.multiple);
+        
+        // As apostas individuais completas vão para a última seção
+        this.renderizarSecao('gridTodasApostas', this.bets.individual);
+        
+        this.filtrarApostas('todas'); // Aplica o filtro padrão para exibir tudo inicialmente
+    }
+    
+    renderizarSecao(idContainer, apostas) {
+        const container = document.getElementById(idContainer);
+        if (!container) return;
+        
+        if (apostas.length === 0) {
+            container.innerHTML = '<div class="cartao-aposta" style="text-align: center; color: var(--cinza-claro); border-left: 5px solid var(--cinza-escuro);">Nenhuma aposta encontrada. A iA pode não ter rodado ainda.</div>';
+            return;
+        }
+
+        container.innerHTML = apostas.map(aposta => {
+            // Usa o 'type' que definimos no mapeamento do Supabase
+            if (aposta.type === 'multipla') {
+                return this.criarCartaoMultipla(aposta);
+            } else {
+                return this.criarCartaoIndividual(aposta);
+            }
+        }).join('');
+    }
+
+    criarCartaoIndividual(aposta) {
+        // Encontra a primeira casa de aposta para usar no card (já que os dados do Python vêm otimizados)
+        const casaKeys = Object.keys(aposta.odds);
+        const casa = casaKeys.length > 0 ? casaKeys[0] : 'betano';
+        const oddInfo = aposta.odds[casa] || { valor: aposta.odd, link: '#' };
+        
+        const badgeGenero = `<span class="badge-genero genero-${aposta.gender || 'M'}">${aposta.gender || 'M'}</span>`;
+        const badgeSegura = this.bets.safe.some(b => b.id === aposta.id) ? '<span class="badge-segura">SEGURA</span>' : '';
+        const badgeTop = this.bets.top.some(b => b.id === aposta.id) ? '<span class="badge-top">TOP</span>' : '';
+
+        return `
+            <div class="cartao-aposta" style="border-left: 5px solid ${aposta.cor_casa || 'var(--azul)'};">
+                <div class="cabecalho-aposta">
+                    <div class="info-partida">
+                        <h3>${aposta.match} ${badgeGenero} ${badgeSegura} ${badgeTop}</h3>
+                        <div class="meta-partida">${aposta.league} • ${aposta.date}</div>
+                    </div>
+                    <div class="tipo-aposta">${aposta.betType}</div>
+                </div>
+                
+                <div class="detalhes-aposta">
+                    <div class="item-detalhe">
+                        <span class="rotulo-detalhe">Probabilidade</span>
+                        <span>${(aposta.probability * 100).toFixed(0)}%</span>
+                    </div>
+                    <div class="item-detalhe">
+                        <span class="rotulo-detalhe">Odd da Casa</span>
+                        <span>${oddInfo.valor}</span>
+                    </div>
+                    <div class="item-detalhe">
+                        <span class="rotulo-detalhe">Valor Esperado (VE)</span>
+                        <span class="valor-positivo">+${(aposta.value * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="item-detalhe">
+                        <span class="rotulo-detalhe">Confiança</span>
+                        <span>${aposta.confidence}</span>
+                    </div>
+                </div>
+
+                <div class="selecao-casas">
+                    <div class="titulo-casas">🎯 Casa Recomendada:</div>
+                    <div class="odds-casas">
+                        <div class="item-odd">
+                            <span class="casa-odd">${aposta.house}:</span>
+                            <span class="valor-odd">${oddInfo.valor}</span>
+                        </div>
+                    </div>
+                    <div class="botoes-casas">
+                        <button class="botao-casa ${casa}" onclick="lanzacaIA.apostarAgora('${aposta.id}', 'individual', '${casa}', ${oddInfo.valor}, '${oddInfo.link}')">
+                            <i class="fas fa-external-link-alt"></i> Apostar na ${aposta.house}
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="rodape-aposta">
+                    <div class="badge-stake">${aposta.stake}</div>
+                    <div style="color: var(--cinza-claro); font-size: 0.9em;">Link direto gerado pela iA</div>
+                </div>
+            </div>
+        `;
+    }
+
+    criarCartaoMultipla(aposta) {
+        const badgeTop = this.bets.top.some(b => b.id === aposta.id) ? '<span class="badge-top">TOP</span>' : '';
+        const oddInfo = aposta.odds.betano || { valor: aposta.totalOdd, link: '#' };
+        
+        return `
+            <div class="cartao-aposta" style="border-left: 5px solid var(--verde);">
+                <div class="cabecalho-aposta">
+                    <div class="info-partida">
+                        <h3>Aposta Múltipla ${badgeTop}</h3>
+                        <div class="meta-partida">${aposta.matches.length} seleções combinadas</div>
+                    </div>
+                    <div class="tipo-aposta">MÚLTIPLA</div>
+                </div>
+                
+                <div class="detalhes-aposta">
+                    ${aposta.matches.map(partida => `
+                        <div class="partida-multipla">
+                            <div class="info-multipla">
+                                <div class="nome-partida">${partida.match}</div>
+                                <div class="detalhe-multipla">
+                                    <span style="color: var(--verde); font-weight: bold;">${partida.bet_type}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                    
+                    <div class="item-detalhe" style="border-top: 1px dashed var(--cinza-escuro); padding-top: 10px; margin-top: 10px;">
+                        <span class="rotulo-detalhe">Probabilidade Total</span>
+                        <span>${(aposta.probability * 100).toFixed(0)}%</span>
+                    </div>
+                    <div class="item-detalhe">
+                        <span class="rotulo-detalhe">Odd Total</span>
+                        <span>${aposta.totalOdd}</span>
+                    </div>
+                    <div class="item-detalhe">
+                        <span class="rotulo-detalhe">Valor (VE)</span>
+                        <span class="valor-positivo">+${(aposta.value * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="item-detalhe">
+                        <span class="rotulo-detalhe">Confiança</span>
+                        <span>${aposta.confidence}</span>
+                    </div>
+                </div>
+
+                <div class="selecao-casas">
+                    <div class="titulo-casas">🎯 Faça sua aposta combinada:</div>
+                    <div class="botoes-casas">
+                        <button class="botao-casa betano" onclick="lanzacaIA.apostarAgora('${aposta.id}', 'multipla', 'betano', ${oddInfo.valor}, '${oddInfo.link}')">
+                            <i class="fas fa-external-link-alt"></i> Apostar na Betano
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="rodape-aposta">
+                    <div class="badge-stake">${aposta.stake}</div>
+                    <div style="color: var(--cinza-claro); font-size: 0.9em;">Link gerado pela iA</div>
+                </div>
+            </div>
+        `;
+    }
+
+    updateStatistics() {
+        document.getElementById('apostasIndividuais').textContent = this.bets.individual.length;
+        document.getElementById('apostasMultiplas').textContent = this.bets.multiple.length;
+        document.getElementById('apostasSeguras').textContent = this.bets.safe.length;
+        document.getElementById('totalJogos').textContent = this.bets.individual.length + this.bets.multiple.length;
+    }
+
+    filtrarApostas(filtro) {
+        const todasSections = [
+            { id: 'topApostas', tipo: 'top' },
+            { id: 'gridApostasSeguras', tipo: 'safe' },
+            { id: 'gridMultiplas', tipo: 'multiplas' },
+            { id: 'gridTodasApostas', tipo: 'individuais' }
+        ];
+
+        todasSections.forEach(item => {
+            const section = document.getElementById(item.id);
+            if (section) {
+                if (filtro === 'todas') {
+                    section.style.display = 'grid';
+                } else if (filtro === item.tipo) {
+                    section.style.display = 'grid';
+                } else {
+                    section.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    apostarAgora(id, tipo, casa, odd, link) {
+        this.mostrarToast(`🔗 Redirecionando para ${casa} (Odd: ${odd})...`);
+        
+        setTimeout(() => {
+            window.open(link, '_blank');
+        }, 500);
+    }
+
+    mostrarToast(mensagem, tipo = 'info') {
+        const toast = document.getElementById('toast');
+        toast.textContent = mensagem;
+        
+        // Estilos de feedback rápido
+        toast.style.backgroundColor = {
+            'info': 'var(--cinza-escuro)',
+            'success': 'var(--verde-escuro)',
+            'error': 'var(--laranja-escuro)'
+        }[tipo];
+
+        toast.classList.add('mostrar');
+        
+        setTimeout(() => {
+            toast.classList.remove('mostrar');
+        }, 3000);
+    }
+}
+
+// Inicializar sistema
+const lanzacaIA = new LanzacaIA();
+
+// Funções globais para os botões (simples wrappers)
+async function fazerLogin() {
+    const usuario = document.getElementById('usuario').value;
+    const senha = document.getElementById('senha').value;
+    
+    if (!usuario || !senha) {
+        lanzacaIA.mostrarToast('Por favor, preencha usuário e senha!', 'error');
+        return;
+    }
+    
+    await lanzacaIA.fazerLogin(usuario, senha);
+}
+
+function fazerLogout() {
+    lanzacaIA.fazerLogout();
+}
