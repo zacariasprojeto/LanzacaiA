@@ -4,26 +4,52 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>⚡ Lanzaca iA de Palpites</title>
+
+  <!-- CSS principal -->
   <link rel="stylesheet" href="/static/style.css">
+
+  <!-- Ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+
+  <!-- TELA DE LOGIN -->
   <div id="authContainer" class="tela-login">
     <div class="login-container">
+      
       <div class="login-logo">⚡</div>
       <h1 class="login-titulo">Lanzaca iA de Palpites</h1>
-      <div class="input-group"><label for="email">Email</label><input id="email" type="email"/></div>
-      <div class="input-group"><label for="password">Senha</label><input id="password" type="password"/></div>
+
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="seuemail@exemplo.com"/>
+      </div>
+
+      <div class="input-group">
+        <label for="password">Senha</label>
+        <input id="password" type="password" placeholder="Sua senha"/>
+      </div>
+
       <button id="loginBtn" class="botao-login">Entrar</button>
-      <button id="showRegister" class="botao-login" style="margin-top:8px;background:transparent;border:1px solid var(--verde);color:var(--verde)">Cadastrar</button>
-      <div id="authMsg" style="margin-top:12px;color:var(--cinza-claro);"></div>
+
+      <button id="showRegister"
+              class="botao-login"
+              style="margin-top:8px;background:transparent;border:1px solid var(--verde);color:var(--verde)">
+        Cadastrar
+      </button>
+
+      <div id="authMsg" style="margin-top:12px;color:var(--cinza-claro);min-height:18px;"></div>
     </div>
   </div>
 
+  <!-- CONTEÚDO PRINCIPAL (oculto até logar) -->
   <div id="containerPrincipal" class="container-principal" style="display:none;">
-    <!-- header, admin panel, status, grids (mesmo layout anterior) -->
+    
     <header class="cabecalho">
-      <div class="logo"><h1><i class="fas fa-bolt"></i> Lanzaca iA de Palpites</h1>
-     </div>
+      <div class="logo">
+        <h1><i class="fas fa-bolt"></i> Lanzaca iA de Palpites</h1>
+      </div>
+
       <div class="info-usuario">
         <div id="nomeUsuario" class="usuario-nome">Olá, usuário</div>
         <button id="btnAdminToggle" class="botao-admin">Admin</button>
@@ -31,28 +57,18 @@
       </div>
     </header>
 
+    <!-- Painel Admin -->
     <div id="adminPanel" class="admin-panel" style="display:none;">
       <h2>Usuários pendentes</h2>
       <div id="pendingList">—</div>
     </div>
 
-    <div class="barra-status"> ... </div>
-
-    <div id="topApostas" class="grid-apostas"></div>
-    <div id="gridApostasSeguras" class="grid-apostas"></div>
-    <div id="gridMultiplas" class="grid-apostas"></div>
-    <div id="gridTodasApostas" class="grid-apostas"></div>
-  </div>
-
-  <div id="toast" class="toast"></div>
-
-  <!-- pass server-injected keys to JS safely -->
-  <script>
-    window.__ENV__ = {
-      SUPABASE_URL: "{{ SUPABASE_URL }}",
-      SUPABASE_ANON_KEY: "{{ SUPABASE_ANON_KEY }}",
-    };
-  </script>
-  <script src="/static/app.js"></script>
-</body>
-</html>
+    <!-- Status -->
+    <div class="barra-status">
+      <div class="item-status">
+        <div class="valor-status" id="apostasIndividuais">0</div>
+        <div style="color:var(--cinza-claro)">Individuais</div>
+      </div>
+      <div class="item-status">
+        <div class="valor-status" id="apostasMultiplas">0</div>
+        <d
