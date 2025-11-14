@@ -1,98 +1,54 @@
-/* Novos Estilos para as Seções */
-
-/* Seção Top do Dia */
-.featured-section {
-    margin-bottom: 30px;
+:root{
+  --verde:#00ff88;
+  --verde-escuro:#00cc6a;
+  --azul:#00aaff;
+  --laranja:#ff6b6b;
+  --preto:#0a0a0a;
+  --preto-claro:#1a1a1a;
+  --cinza-claro:#888888;
+  --branco:#ffffff;
 }
 
-/* Seção Apostas Seguras */
-.safe-section {
-    margin-bottom: 30px;
+/* reset */
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg,var(--preto-claro),var(--preto));
+  color:var(--branco);
+  min-height:100vh;
+  line-height:1.6;
 }
 
-.safe-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 15px;
-}
+/* Login */
+.tela-login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999}
+.login-container{background:rgba(26,26,26,0.95);padding:30px;border-radius:16px;border:2px solid var(--verde);max-width:420px;width:100%;text-align:center}
+.login-logo{font-size:2.5em;margin-bottom:12px}
+.login-titulo{font-size:1.8em;margin-bottom:8px;background:linear-gradient(135deg,var(--verde),var(--azul));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.input-group{margin-bottom:14px;text-align:left}
+.input-group label{color:var(--cinza-claro);display:block;margin-bottom:6px;font-weight:600}
+.input-group input{width:100%;padding:12px;border-radius:10px;border:2px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:var(--branco)}
+.botao-login{width:100%;padding:12px;border-radius:10px;border:none;background:var(--verde);color:var(--preto);font-weight:700;cursor:pointer}
 
-.safe-bet {
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 170, 255, 0.1));
-    border: 2px solid var(--primary);
-}
+/* Main */
+.container-principal{max-width:1200px;margin:24px auto;padding:18px}
+.cabecalho{background:rgba(26,26,26,0.95);border-radius:12px;padding:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(0,255,136,0.08)}
+.info-usuario{display:flex;gap:10px;align-items:center}
+.botao-logout, .botao-admin{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:var(--cinza-claro);cursor:pointer}
 
-.safe-bet::before {
-    background: var(--primary);
-}
+/* status */
+.barra-status{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:12px}
+.item-status{background:rgba(26,26,26,0.8);padding:12px;border-radius:10px;text-align:center;border:1px solid rgba(255,255,255,0.04)}
+.valor-status{font-size:1.6em;color:var(--verde);font-weight:700}
 
-.safe-badge {
-    background: var(--primary);
-    color: var(--dark);
-    padding: 3px 8px;
-    border-radius: 10px;
-    font-size: 0.7em;
-    font-weight: bold;
-    margin-left: 8px;
-}
+/* cards */
+.grid-apostas{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:20px}
+.cartao-aposta{background:rgba(26,26,26,0.9);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04)}
+.cabecalho-aposta{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.tipo-aposta{background:var(--verde);color:var(--preto);padding:4px 8px;border-radius:8px;font-weight:700}
 
-/* Seção Top Bets */
-.top-bet {
-    background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 170, 0, 0.1));
-    border: 2px solid var(--accent);
-}
+/* toast */
+.toast{position:fixed;right:20px;bottom:20px;background:var(--verde);color:var(--preto);padding:10px 14px;border-radius:8px;transform:translateY(120px);opacity:0;transition:all .25s}
+.toast.show{transform:translateY(0);opacity:1}
 
-.top-bet::before {
-    background: var(--accent);
-}
-
-.top-badge {
-    background: var(--accent);
-    color: var(--light);
-    padding: 3px 8px;
-    border-radius: 10px;
-    font-size: 0.7em;
-    font-weight: bold;
-    margin-left: 8px;
-}
-
-/* Badges de Gênero Compactos */
-.gender-badge {
-    display: inline-block;
-    padding: 2px 6px;
-    border-radius: 8px;
-    font-size: 0.7em;
-    font-weight: bold;
-    margin-left: 5px;
-}
-
-.gender-M {
-    background: #00aaff;
-    color: white;
-}
-
-.gender-F {
-    background: #ff66cc;
-    color: white;
-}
-
-/* Data do Jogo */
-.match-date {
-    color: var(--gray-light);
-    font-size: 0.8em;
-    margin-top: 2px;
-}
-
-/* Grids Responsivos */
-.featured-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-
-.multiples-grid {
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-}
-
-/* Status Items Adicionais */
-.status-item.highlight {
-    background: rgba(0, 255, 136, 0.2);
-    border-color: var(--primary);
-}
+/* admin panel */
+.admin-panel{background:rgba(26,26,26,0.95);padding:14px;border-radius:12px;border:1px solid rgba(0,170,255,0.08)}
