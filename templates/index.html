@@ -71,4 +71,136 @@
       </div>
       <div class="item-status">
         <div class="valor-status" id="apostasMultiplas">0</div>
-        <d
+        <div style="color:var(--cinza-claro)">Múltiplas</div>
+      </div>
+      <div class="item-status">
+        <div class="valor-status" id="apostasSeguras">0</div>
+        <div style="color:var(--cinza-claro)">Seguras</div>
+      </div>
+    </div>
+
+    <!-- Grids -->
+    <h2 class="titulo-secao"><i class="fas fa-crown"></i> TOP 5 DO DIA</h2>
+    <div id="topApostas" class="grid-apostas"></div>
+
+    <h2 class="titulo-secao"><i class="fas fa-shield-alt"></i> APOSTAS SEGURAS</h2>
+    <div id="gridApostasSeguras" class="grid-apostas"></div>
+
+    <h2 class="titulo-secao"><i class="fas fa-cubes"></i> APOSTAS MÚLTIPLAS</h2>
+    <div id="gridMultiplas" class="grid-apostas"></div>
+
+    <h2 class="titulo-secao"><i class="fas fa-list"></i> TODAS AS APOSTAS</h2>
+    <div id="gridTodasApostas" class="grid-apostas"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- JAVASCRIPT DIRETO NA PÁGINA -->
+  <script>
+    let isRegisterMode = false;
+
+    function setAuthMessage(msg, type="info") {
+      const el = document.getElementById("authMsg");
+      if (!el) return;
+      el.textContent = msg;
+      el.style.color = type === "error" ? "#ff6b6b" :
+                       type === "success" ? "#00ff88" : "#cccccc";
+    }
+
+    function toggleMode() {
+      const btnLogin = document.getElementById("loginBtn");
+      const btnToggle = document.getElementById("showRegister");
+
+      isRegisterMode = !isRegisterMode;
+
+      if (isRegisterMode) {
+        btnLogin.textContent = "Enviar cadastro";
+        btnToggle.textContent = "Já tenho conta";
+        setAuthMessage("Preencha email e senha para solicitar acesso.");
+      } else {
+        btnLogin.textContent = "Entrar";
+        btnToggle.textContent = "Cadastrar";
+        setAuthMessage("");
+      }
+    }
+
+    async function doLogin(email, password) {
+      const resp = await fetch("/api/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email, password}),
+      });
+      const data = await resp.json();
+
+      if (data.status === "ok") {
+        setAuthMessage("Login autorizado!", "success");
+        document.getElementById("authContainer").style.display = "none";
+        document.getElementById("containerPrincipal").style.display = "block";
+        document.getElementById("nomeUsuario").textContent =
+          "Olá, " + data.user.email + "!";
+      } else {
+        setAuthMessage(data.msg, "error");
+      }
+    }
+
+    async function doRegister(email, password) {
+      const resp = await fetch("/api/register", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email, password}),
+      });
+      const data = await resp.json();
+
+      if (data.status === "ok") {
+        setAuthMessage(data.msg, "success");
+      } else {
+        setAuthMessage(data.msg, "error");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const emailInput = document.getElementById("email");
+      const passInput = document.getElementById("password");
+      const btnLogin = document.getElementById("loginBtn");
+      const btnToggle = document.getElementById("showRegister");
+      const btnLogout = document.getElementById("btnLogout");
+      const adminPanel = document.getElementById("adminPanel");
+      const btnAdminToggle = document.getElementById("btnAdminToggle");
+
+      btnLogin.addEventListener("click", async () => {
+        const email = emailInput.value.trim();
+        const password = passInput.value.trim();
+        if (!email || !password) {
+          setAuthMessage("Preencha email e senha.", "error");
+          return;
+        }
+        if (isRegisterMode) {
+          await doRegister(email, password);
+        } else {
+          await doLogin(email, password);
+        }
+      });
+
+      btnToggle.addEventListener("click", toggleMode);
+
+      passInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") btnLogin.click();
+      });
+
+      btnLogout.addEventListener("click", async () => {
+        await fetch("/api/logout", {method: "POST"});
+        document.getElementById("containerPrincipal").style.display = "none";
+        document.getElementById("authContainer").style.display = "flex";
+        setAuthMessage("Você saiu da conta.");
+      });
+
+      btnAdminToggle.addEventListener("click", () => {
+        adminPanel.style.display =
+          adminPanel.style.display === "block" ? "none" : "block";
+      });
+    });
+  </script>
+
+</body>
+</html>
