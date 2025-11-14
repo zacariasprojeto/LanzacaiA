@@ -1,54 +1,358 @@
-:root{
-  --verde:#00ff88;
-  --verde-escuro:#00cc6a;
-  --azul:#00aaff;
-  --laranja:#ff6b6b;
-  --preto:#0a0a0a;
-  --preto-claro:#1a1a1a;
-  --cinza-claro:#888888;
-  --branco:#ffffff;
+/* =============================
+   ESTILOS GERAIS DO SISTEMA
+   Lanzaca IA – Versão Completa
+   ============================= */
+
+:root {
+    --verde: #00ff88;
+    --verde-escuro: #00cc6a;
+    --azul: #00aaff;
+    --azul-escuro: #0088cc;
+    --laranja: #ff6b6b;
+    --laranja-escuro: #ff5252;
+    --preto: #0a0a0a;
+    --preto-claro: #1a1a1a;
+    --cinza-escuro: #2a2a2a;
+    --branco: #ffffff;
+    --cinza: #666666;
+    --cinza-claro: #888888;
 }
 
-/* reset */
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg,var(--preto-claro),var(--preto));
-  color:var(--branco);
-  min-height:100vh;
-  line-height:1.6;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Login */
-.tela-login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999}
-.login-container{background:rgba(26,26,26,0.95);padding:30px;border-radius:16px;border:2px solid var(--verde);max-width:420px;width:100%;text-align:center}
-.login-logo{font-size:2.5em;margin-bottom:12px}
-.login-titulo{font-size:1.8em;margin-bottom:8px;background:linear-gradient(135deg,var(--verde),var(--azul));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.input-group{margin-bottom:14px;text-align:left}
-.input-group label{color:var(--cinza-claro);display:block;margin-bottom:6px;font-weight:600}
-.input-group input{width:100%;padding:12px;border-radius:10px;border:2px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:var(--branco)}
-.botao-login{width:100%;padding:12px;border-radius:10px;border:none;background:var(--verde);color:var(--preto);font-weight:700;cursor:pointer}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--preto-claro), var(--preto));
+    color: var(--branco);
+    min-height: 100vh;
+    line-height: 1.6;
+}
 
-/* Main */
-.container-principal{max-width:1200px;margin:24px auto;padding:18px}
-.cabecalho{background:rgba(26,26,26,0.95);border-radius:12px;padding:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(0,255,136,0.08)}
-.info-usuario{display:flex;gap:10px;align-items:center}
-.botao-logout, .botao-admin{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:var(--cinza-claro);cursor:pointer}
+/* =============================
+   LOGIN
+   ============================= */
 
-/* status */
-.barra-status{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:12px}
-.item-status{background:rgba(26,26,26,0.8);padding:12px;border-radius:10px;text-align:center;border:1px solid rgba(255,255,255,0.04)}
-.valor-status{font-size:1.6em;color:var(--verde);font-weight:700}
+.tela-login {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--preto-claro), var(--preto));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
 
-/* cards */
-.grid-apostas{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:20px}
-.cartao-aposta{background:rgba(26,26,26,0.9);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04)}
-.cabecalho-aposta{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.tipo-aposta{background:var(--verde);color:var(--preto);padding:4px 8px;border-radius:8px;font-weight:700}
+.login-container {
+    background: rgba(26, 26, 26, 0.95);
+    padding: 30px;
+    border-radius: 20px;
+    border: 2px solid var(--verde);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
 
-/* toast */
-.toast{position:fixed;right:20px;bottom:20px;background:var(--verde);color:var(--preto);padding:10px 14px;border-radius:8px;transform:translateY(120px);opacity:0;transition:all .25s}
-.toast.show{transform:translateY(0);opacity:1}
+.login-logo {
+    font-size: 3em;
+    margin-bottom: 20px;
+}
 
-/* admin panel */
-.admin-panel{background:rgba(26,26,26,0.95);padding:14px;border-radius:12px;border:1px solid rgba(0,170,255,0.08)}
+.login-titulo {
+    font-size: 2em;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, var(--verde), var(--azul));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.login-descricao {
+    color: var(--cinza-claro);
+    margin-bottom: 30px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--cinza-claro);
+    font-weight: bold;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--branco);
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--verde);
+}
+
+.botao-login {
+    width: 100%;
+    padding: 15px;
+    background: var(--verde);
+    color: var(--preto);
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.botao-login:hover {
+    background: var(--verde-escuro);
+    transform: translateY(-2px);
+}
+
+/* =============================
+   TELA DE CARREGAMENTO
+   ============================= */
+
+.tela-carregamento {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--preto-claro), var(--preto));
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+}
+
+.carregamento-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--verde);
+    border-radius: 50%;
+    animation: girar 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes girar {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* =============================
+   LAYOUT PRINCIPAL
+   ============================= */
+
+.container-principal {
+    display: none;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* HEADER */
+
+.cabecalho {
+    background: rgba(26, 26, 26, 0.95);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    flex-wrap: wrap;
+}
+
+.logo h1 {
+    font-size: 2.2em;
+    background: linear-gradient(135deg, var(--verde), var(--azul));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 5px;
+}
+
+/* USUÁRIO */
+
+.info-usuario {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.usuario-nome {
+    color: var(--verde);
+    font-weight: bold;
+}
+
+.botao-logout,
+.botao-admin {
+    padding: 8px 16px;
+    background: transparent;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.botao-logout {
+    border: 1px solid var(--laranja);
+    color: var(--laranja);
+}
+
+.botao-logout:hover {
+    background: var(--laranja);
+    color: var(--branco);
+}
+
+.botao-admin {
+    border: 1px solid var(--azul);
+    color: var(--azul);
+}
+
+.botao-admin:hover {
+    background: var(--azul);
+    color: var(--branco);
+}
+
+/* =============================
+   PAINEL DE CONTROLE
+   ============================= */
+
+.painel-controle {
+    background: rgba(26, 26, 26, 0.9);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+}
+
+.filtros-rapidos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.botao-filtro {
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--cinza-claro);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.botao-filtro.ativo {
+    background: var(--verde);
+    color: var(--preto);
+}
+
+.botoes-acao {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.botao-acao {
+    padding: 12px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-principal {
+    background: var(--verde);
+    color: var(--preto);
+}
+
+.btn-secundario {
+    background: var(--azul);
+    color: var(--branco);
+}
+
+/* =============================
+   CARDS DE APOSTAS
+   ============================= */
+
+.grid-apostas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.cartao-aposta {
+    background: rgba(26, 26, 26, 0.85);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.3s;
+}
+
+.cartao-aposta:hover {
+    transform: translateY(-5px);
+    border-color: var(--verde);
+}
+
+/* =============================
+   BOTÕES DE APOSTAR
+   ============================= */
+
+.botao-casa {
+    padding: 12px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.25s;
+    background: rgba(255,255,255,0.1);
+}
+
+.botao-casa:hover {
+    border-color: var(--verde);
+    transform: translateY(-2px);
+}
+
+/* =============================
+   TOAST
+   ============================= */
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    background: var(--verde);
+    color: var(--preto);
+    border-radius: 8px;
+    font-weight: bold;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 0.3s;
+}
+
+.toast.mostrar {
+    opacity: 1;
+    transform: translateY(0);
+}
