@@ -39,13 +39,25 @@ def salvar_dados_supabase(dados, table_name):
         
         # Inserir novos registros
         if dados:
+            # 💡 INSERIDO: Bloco de Debug para diagnosticar o Erro 400 do Supabase
+            if table_name == 'individuais':
+                try:
+                    print("-------------------------------------------------------")
+                    print(f"DEBUG: DADOS DE INDIVÍDUOS A SEREM SALVOS (Primeiro Item):")
+                    # Usamos json.dumps para garantir que o output é JSON e legível
+                    print(json.dumps(dados[0], indent=4)) 
+                    print("-------------------------------------------------------")
+                except Exception as debug_e:
+                    print(f"DEBUG ERROR: Não foi possível imprimir o JSON: {debug_e}")
+            # Fim do Bloco de Debug
+            
             insert_response = requests.post(url, json=dados, headers=SUPABASE_HEADERS)
             
             if insert_response.status_code in [200, 201]:
                 print(f"✅ {len(dados)} registros salvos em {table_name}")
                 return True
             else:
-                print(f"❌ Erro ao salvar: {insert_response.status_code}")
+                print(f"❌ Erro ao salvar (código {insert_response.status_code}): {insert_response.text}")
                 return False
         else:
             print(f"ℹ️ Nenhum dado para salvar em {table_name}")
@@ -161,13 +173,14 @@ def buscar_odds_ao_vivo():
             print("❌ ODDS_API_KEY não configurada")
             return None
         
-        # Esportes mais populares com mais chances de ter dados
+        # ⚠️ CORRIGIDO: Nomenclatura das ligas para evitar Erro 422/404
         sports = [
-            'soccer_epl',           # Premier League
-            'soccer_spain_la_liga', # La Liga
-            'soccer_italy_serie_a', # Serie A
-            'soccer_uefa_champs',   # Champions League
-            'soccer_germany_bundesliga', # Bundesliga
+            'soccer_england_premier_league',  # Premier League (corrigido de epl)
+            'soccer_spain_la_liga',          # La Liga
+            'soccer_italy_serie_a',          # Serie A
+            'soccer_uefa_champions_league',  # CORRIGIDO de soccer_uefa_champs (causa do 404)
+            'soccer_germany_bundesliga',     # Bundesliga
+            # Você pode adicionar mais ligas aqui
         ]
         
         all_odds = []
@@ -192,7 +205,8 @@ def buscar_odds_ao_vivo():
                     else:
                         print(f"ℹ️ Nenhum evento em {sport}")
                 else:
-                    print(f"❌ Erro {response.status_code} em {sport}")
+                    # 💡 INSERIDO: Exibir corpo da resposta em caso de erro 400/401/422 para diagnóstico
+                    print(f"❌ Erro {response.status_code} em {sport}. Detalhe: {response.text}") 
                 
                 time.sleep(1)
                 
@@ -315,6 +329,8 @@ def gerar_palpites_ao_vivo():
             odds_reais = None
             if odds_data:
                 for evento in odds_data:
+                    # Usar a hora do jogo como critério de correspondência pode ser mais preciso
+                    # Mas, mantendo a lógica de nome para simplificar
                     if (evento['home_team'].lower() in home_team.lower() or 
                         home_team.lower() in evento['home_team'].lower()):
                         odds_reais = evento
